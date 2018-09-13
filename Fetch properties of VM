@@ -1,0 +1,15 @@
+$ResourceGroups = Get-AzureRmResourceGroup
+
+function f1 {
+ 
+ForEach ($ResourceGroup in $ResourceGroups) {
+ 
+    $VMs = Get-AzureRmVM -ResourceGroupName $ResourceGroup.ResourceGroupName 
+  
+    ForEach ($VM in $VMs){
+
+   
+    Get-AzureRmVM -ResourceGroupName $ResourceGroup.ResourceGroupName -Name $VM.Name | select Name, ResourceGroupName , Id}}}
+
+
+f1 | Export-Csv -path "C:\Users\M1046504\Desktop\vmid.csv" -encoding 'utf8' -notypeinformation
