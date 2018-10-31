@@ -1,0 +1,47 @@
+<#
+
+For NA Subscription : eastus2
+For EU Subscription : westeurope
+For AP subscription : SoutheastAsia
+
+#>
+
+
+
+
+function VmSize
+{   
+       
+      
+       $RGs = Get-AzureRmResourceGroup | select ResourceGroupName
+
+       foreach ($RG in $RGs) {
+        
+            $vminfo = Get-AzureRmVM -ResourceGroupName $RG.ResourceGroupName
+            If ($($vminfo).count -gt 0) 
+            {
+                ForEach ($vmi in $vminfo)
+                {
+                    $sizeinfo = Get-AzureRmVMSize -Location $vmi.location | where-object {$_.name -eq "$($vmi.hardwareprofile.vmsize)"}
+                    $props = [ordered]@{
+                    "Name" = $vmi.name
+                    "HardwareProfile" = $vmi.hardwareprofile.vmsize
+                    "Location" = $vmi.location
+                    "NumberofCores" = $sizeinfo.NumberOfCores
+                    "MemoryInMB" = $sizeinfo.MemoryinMB
+                    "MaxDataDiskCount" = $sizeinfo.MaxDataDiskCount
+                    "OSDiskSizeInMB" = $sizeinfo.OSDiskSizeInMB
+                    "ResourceDiskSizeInMB" = $sizeinfo.ResourceDiskSizeInMB
+                    
+                    }
+                $Results += @(New-Object pscustomobject -Property $props)
+                }
+            }
+            }
+        
+    
+        Write-Output $Results | Export-Csv .\size.csv
+    }
+
+
+    VmSize -Location <Enter Location as per subscription> 
