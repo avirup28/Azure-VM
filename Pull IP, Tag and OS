@@ -1,0 +1,19 @@
+
+$VMs = Get-AzVM | select Name,ResourceGroupName
+
+foreach ($VM in $VMs) {
+
+$VmNic = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name)
+$NifName = ($VmNic.NetworkProfile[0].NetworkInterfaces.Id).Split('/') | Select-Object -Last 1
+$MyInterface = (Get-AzNetworkInterface -Name $NifName -ResourceGroupName $VmNic.ResourceGroupName).IpConfigurations
+$PrivateIP = $MyInterface.privateipaddress
+
+$OS = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).StorageProfile.OsDisk.OsType
+$M = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Tags.Mega_ID
+$A = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Tags.Application_Name
+
+
+Write-Host "$($VM.Name);$($VM.ResourceGroupName);$PrivateIP;$OS;$M;$A"
+
+
+    }
