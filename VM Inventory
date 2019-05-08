@@ -1,0 +1,27 @@
+$VMs = Get-AzVM | select Name,ResourceGroupName,Location
+
+foreach ($VM in $VMs) {
+
+$VmNic = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name)
+$NifName = ($VmNic.NetworkProfile[0].NetworkInterfaces.Id).Split('/') | Select-Object -Last 1
+$MyInterface = (Get-AzNetworkInterface -Name $NifName -ResourceGroupName $VmNic.ResourceGroupName).IpConfigurations
+$PrivateIP = $MyInterface.privateipaddress
+
+$Ext1 = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Extensions.Name -match "oms"
+$Ext2 = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Extensions.Name -match "microsoftmonitoringagent"
+
+if (($Ext1) -or ($Ext2)) {$OMS = 'Yes'}
+else {$OMS = 'No'}
+
+$OS = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).StorageProfile.ImageReference.Offer
+$Version = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).StorageProfile.ImageReference.Sku
+$Size = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).HardwareProfile.VmSize
+$TechA = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Tags.Technical_Agency
+$App = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Tags.Application_Name
+$Env = (Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $Vm.Name).Tags.Stage
+
+
+Write-Host "$($VM.Name);$($VM.ResourceGroupName);$($VM.Location);$PrivateIP;$OS;$Version;$Size;$TechA;$App;$Env;$OMS"
+
+
+    }
