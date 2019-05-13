@@ -1,0 +1,13 @@
+$AVs = Get-AzAvailabilitySet | select Name,ResourceGroupName
+
+foreach ($Av in $Avs) {
+
+$IDs = (Get-AzAvailabilitySet -ResourceGroupName $Av.ResourceGroupName -Name $AV.Name).VirtualMachinesReferences.Id
+
+foreach ($ID in $IDs) {
+
+$VM = ($ID -split '/')[8] 
+
+Write-Host "$($AV.Name);$($Av.ResourceGroupName);$VM"}
+Write-Host "`n"
+}
